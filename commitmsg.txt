@@ -1,0 +1,1 @@
+feat: Qwen 3.8 27B OpenCode skills collection
