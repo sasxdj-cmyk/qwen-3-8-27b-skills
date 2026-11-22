@@ -29,9 +29,9 @@ Le skill e i plugin sotto mirano esattamente a questi tre problemi.
 | **context-optimizer** | LLMLingua-2 + rerank + dedupe sulla compattazione. Gira in locale, fail-open. Mantiene sessioni piccole senza perdere contesto critico. | — | [evermeer/context-optimizer](https://github.com/evermeer/context-optimizer) |
 | **opencode-magic-context** | Historian in background + memoria cross-session + consolidamento notturno. Tutto cache-aware. | — | [bf-frieder/opencode-magic-context](https://github.com/bf-frieder/opencode-magic-context) |
 | **opencode-slim** | Panel TUI contesto, compressione semantica, pruning cost-aware, soglie adattive. | — | [serkanalgur/opencode-slim](https://github.com/serkanalgur/opencode-slim) |
-| **fast-jev-opencode** | Prune verbatim di tool call vecchi e output ingombranti, decisioni TypeSafe Jev. Nessuna summarizzazione. | MIT | [roshan-shaik-ml/fast-jev-opencode](https://github.com/roshan-shaik-ml/fast-jev-opencode) |
+| **gguf-context-skill** | Compattazione contesto locale tramite modello GGUF piccolo (es. Qwen 2.5 1.5B IQ3) via `llama-server`. Zero chiamate API esterne, tutto offline. | MIT | [./gguf-context-skill](./gguf-context-skill) |
 
-> **Nota:** su un setup Qwen 3.8 27B IQ3 locale, la finestra di contesto è già stretta. Scegli **un solo** gestore di contesto, non diversi — si sovrappongono e possono confliggere.
+> **Nota:** su un setup Qwen 3.8 27B IQ3 locale, la finestra di contesto è già stretta. Scegli **un solo** gestore di contesto, non diversi — si sovrappongono e possono confliggere. La skill GGUF locale richiede `llama-server` con un modello piccolo su una porta separata.
 
 ### 2. Skill per comportamento / output
 
@@ -72,6 +72,19 @@ git clone https://github.com/hardikpandya/stop-slop.git ~/.config/opencode/skill
 ### C. Skill (prompt-engineering)
 
 Copia la cartella `prompt-engineering` in `~/.config/opencode/skills/prompt-engineering/`, mantenendo il suo `SKILL.md`.
+
+### D. Local GGUF context manager (no external API)
+
+```bash
+# 1. Scarica un modello GGUF piccolo
+hf download Qwen/Qwen2.5-1.5B-Instruct-GGUF --include "*IQ3_XXS*" --local-dir ./models/qwen-ctx
+
+# 2. Avvia llama-server su porta locale
+llama-server -m ./models/qwen-ctx/qwen2.5-1.5b-instruct-iq3_xxs.gguf -c 4096 -ngl 99 -t 4 --port 11434 --host 127.0.0.1
+
+# 3. Copia la skill
+cp -r gguf-context-skill ~/.config/opencode/skills/gguf-context-skill
+```
 
 ---
 
